@@ -1,0 +1,15 @@
+# comment
+ordner1b:
+  datei1_1b
+  datei1_2b
+  ordner11b:
+    datei11_1b
+    datei11_2b
+  ordner12b:
+    datei12_1b
+ordner2b:
+  ordner21b:
+    ordner211b:
+      datei211_1b
+ordner3b:
+  datei31b
