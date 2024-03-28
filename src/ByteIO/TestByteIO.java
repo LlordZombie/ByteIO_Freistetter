@@ -45,4 +45,11 @@ public class TestByteIO {
     public static void decryptFile(Path srcFile, Path destFile, int key) throws IOException {
         encryptFile(srcFile,destFile,key);
     }
+    public static void encryptFile(Path srcFile, Path destFile, String key) throws IOException {
+        decryptFile(srcFile,destFile,key.hashCode());
+    }
+
+    public static void decryptFile(Path srcFile, Path destFile, String key) throws IOException {
+        decryptFile(srcFile,destFile,key.hashCode());
+    }
 }
