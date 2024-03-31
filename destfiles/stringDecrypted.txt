@@ -1,0 +1,121 @@
+package freistetterwiebeigit.ue11_fileio;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
+
+public class DiverseMethoden {//comment for deleteremarks
+
+    public static void copy(String in, String out) {
+        try {
+            Files.copy(Path.of(in), Path.of(out), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new UncheckedIOException(new IOException("eier lecken"));
+        }
+    }/*
+    block for deeleterematrs
+    */
+/*/*/
+    //auch für delteremarks
+    public static void convertFileToUppercase(String srcFile, String destFile) {
+        try (BufferedReader in = Files.newBufferedReader(Paths.get(srcFile), StandardCharsets.UTF_8);
+             BufferedWriter out = Files.newBufferedWriter(Path.of(destFile), StandardCharsets.UTF_8)) {
+
+            in.lines().forEach(i -> {
+                try {
+                    out.write(i.toUpperCase() + "\n");
+                } catch (IOException e) {
+                    throw new UncheckedIOException(new IOException("eier lecken 2 electric boogaloo"));
+                }
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void convertFileToLowercase(String srcFile, String destFile) {
+        try (BufferedReader in = Files.newBufferedReader(Paths.get(srcFile), StandardCharsets.UTF_8); BufferedWriter out = Files.newBufferedWriter(Path.of(destFile), StandardCharsets.UTF_8)) {
+            in.lines().forEach(i -> {
+                try {
+                    out.write(i.toLowerCase() + "\n");
+                } catch (IOException e) {
+                    throw new UncheckedIOException(new IOException("eier lecken 3 eine echte eierei"));
+                }
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static boolean compareFiles(String file1, String file2) {
+        try (BufferedReader reader1 = Files.newBufferedReader(Paths.get(file1), StandardCharsets.UTF_8); BufferedReader reader2 = Files.newBufferedReader(Path.of(file2), StandardCharsets.UTF_8)) {
+            return Arrays.equals(reader1.lines().toArray(String[]::new), reader2.lines().toArray(String[]::new));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void encryptFile(String srcFile, String destFile) {
+        try (BufferedReader in = Files.newBufferedReader(Paths.get(srcFile), StandardCharsets.UTF_8); BufferedWriter out = Files.newBufferedWriter(Path.of(destFile), StandardCharsets.UTF_8)) {
+            in.lines().forEach(i -> {
+                try {
+                    StringBuilder line = new StringBuilder();
+                    for (int j = 0; j < i.length(); j++) {
+                        char c = i.charAt(j);
+                        line.append((char) (Character.isDigit(c) ? (c < '5' ? c + 5 : c - 5) : (c >= 'a' ? (c > 'm' ? (c <= 'z' ? c - 13 : c) : c + 13) : (c <= 'Z' ? (c >= 'A' ? (c > 'M' ? c - 13 : c + 13) : c) : c))));
+                    }
+                    out.write(line + "\n");
+                } catch (IOException e) {
+                    throw new UncheckedIOException(new IOException("eier lecken 4 gemeinsam mit mir"));
+                }
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void decryptFile(String srcFile, String destFile) {
+        encryptFile(srcFile, destFile);
+    }
+
+    public static void countChar(String srcFile, String statisticFile) {
+        try (BufferedReader in = Files.newBufferedReader(Paths.get(srcFile), StandardCharsets.UTF_8); BufferedWriter out = Files.newBufferedWriter(Path.of(statisticFile), StandardCharsets.UTF_8)) {
+            String[] r = new String[26];
+            int[] stats = new int[26];
+            var ref = new Object() {
+                int sum = 0;
+            };
+            in.lines().forEach(i -> {
+                i = i.toLowerCase();
+                for (int j = 0; j < i.length(); j++) {
+                    if (i.charAt(j) >= 'a' && i.charAt(j) <= 'z') {
+                        ref.sum++;
+                        stats[i.charAt(j) - 'a']++;
+                    }
+                }
+            });
+            for (int i = 0; i < stats.length; i++) {
+                r[i] = "";
+                r[i] += String.format("%.4f", (double) stats[i] / ref.sum) + ((char) (i + 'a')) + ";" + (i + 'a') + ";" + stats[i] + ";" + String.format("%4f", (double) stats[i] / ref.sum)+"\n";
+            }
+            Arrays.sort(r);
+            Arrays.stream(r).forEach(i -> {
+                try {
+                    String kurz = i.substring(6);
+                    out.write(kurz);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(new IOException("eier lecken 6 (🤨)"));
+                }
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+}
