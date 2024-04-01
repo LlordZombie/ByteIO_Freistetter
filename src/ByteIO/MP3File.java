@@ -253,7 +253,7 @@ public class MP3File {
         return b.toString();
     }
 
-    private void processFile(Path file) {
+    private void processFile(Path file) {//TODO: id3v1.1 einbauen
         if (Arrays.asList(file.toString().split("[.]")).getLast().equals("mp3")) {
             try (InputStream in = Files.newInputStream(file)) {
                 in.skipNBytes(in.available() - 125);
