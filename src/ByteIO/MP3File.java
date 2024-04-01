@@ -5,15 +5,26 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.stream.Stream;
 
 public class MP3File {
-    private final ArrayList<String> id3s;
+    private final ArrayList<String> id3s = new ArrayList<>();
 
+    public MP3File(Path... in) {
+        for (Path p : in) {
+            try {
+                id3s.addAll(new MP3File(p).id3s);
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+        if (id3s.isEmpty()) {
+            throw new IllegalArgumentException("no mp3s found");
+        }
+    }
 
     public MP3File(Path in) {
-        id3s = new ArrayList<>();
         try {
             if (Files.isDirectory(in)) {
                 try (Stream<Path> paths = Files.walk(in)) {
@@ -25,13 +36,15 @@ public class MP3File {
                 throw new IllegalArgumentException("Path [" + in + "] could not be handled");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
+        }
+        if (id3s.isEmpty()) {
+            throw new IllegalArgumentException("no mp3s found");
         }
     }
 
     private static HashMap<Byte, String> genId3Genre() {
         HashMap<Byte, String> id3GenreTags = new HashMap<>();
-
         id3GenreTags.put((byte) 0, "Blues");
         id3GenreTags.put((byte) 1, "Classic Rock");
         id3GenreTags.put((byte) 2, "Country");
@@ -227,25 +240,42 @@ public class MP3File {
         return id3GenreTags;
     }
 
-    private void processFile(Path file) {
-        try (InputStream in = Files.newInputStream(file)) {
-            in.skipNBytes(in.available() - 125);
-            byte[] current = new byte[30];
-            in.readNBytes(current, 0, 30);
-            String title = new String(current);
-            in.readNBytes(current, 0, 30);
-            String artist = new String(current);
-            in.readNBytes(current, 0, 30);
-            String album = new String(current);
-            in.readNBytes(current, 0, 30);
-            String comment = new String(current);
-            current = new byte[4];
-            in.readNBytes(current, 0, 4);
-            String year = new String(current);
-            byte genre = in.readNBytes(1)[0];
+    public String toString() {
+        StringBuilder b = new StringBuilder();
+        id3s.forEach(song -> {
+            String[] values = song.split(";");
+            String[] labels = {"Title", "Artist", "Album", "Year", "Comment", "Genre"};
+            for (int i = 0; i < values.length; i++) {
+                b.append(labels[i]).append(": [").append(values[i]).append("]").append("\n");
+            }
+            b.append("\n");
+        });
+        return b.toString();
+    }
 
-        } catch (IOException e) {
-            e.printStackTrace();
+    private void processFile(Path file) {
+        if (Arrays.asList(file.toString().split("[.]")).getLast().equals("mp3")) {
+            try (InputStream in = Files.newInputStream(file)) {
+                in.skipNBytes(in.available() - 125);
+                byte[] current = new byte[30];
+                HashMap<Byte, String> genres = genId3Genre();
+                in.readNBytes(current, 0, 30);
+                String title = new String(current).strip().replace(String.valueOf((char) 0), "");
+                in.readNBytes(current, 0, 30);
+                String artist = new String(current).strip().replace(String.valueOf((char) 0), "");
+                in.readNBytes(current, 0, 30);
+                String album = new String(current).strip().replace(String.valueOf((char) 0), "");
+                current = new byte[4];
+                in.readNBytes(current, 0, 4);
+                String year = new String(current).strip().replace(String.valueOf((char) 0), "");
+                current = new byte[30];
+                in.readNBytes(current, 0, 30);
+                String comment = new String(current).strip().replace(String.valueOf((char) 0), "");
+                String genre = genres.get(in.readNBytes(1)[0]);
+                id3s.add(title + ";" + artist + ";" + album + ";" + year + ";" + comment + ";" + genre);
+            } catch (IOException e) {
+                System.err.println(e.getMessage());
+            }
         }
     }
 }

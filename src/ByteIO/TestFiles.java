@@ -28,12 +28,12 @@ public class TestFiles {
                 }
                 Path p = buildPath(layers);
                 try {
-                    if (layers.get(layers.size() - 1).charAt(layers.get(layers.size() - 1).length() - 1) == ':') {
-
-                        Files.createDirectories(p);
-
-                    } else {
-                        Files.createFile(p);
+                    if (!Files.exists(p)) {
+                        if (layers.getLast().charAt(layers.getLast().length() - 1) == ':') {
+                            Files.createDirectories(p);
+                        } else {
+                            Files.createFile(p);
+                        }
                     }
                 } catch (IOException e) {
                     throw new UncheckedIOException(new IOException("scheiß files oida" + e));
