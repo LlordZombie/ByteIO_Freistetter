@@ -244,7 +244,7 @@ public class MP3File {
         StringBuilder b = new StringBuilder();
         id3s.forEach(song -> {
             String[] values = song.split(";");
-            String[] labels = {"Title", "Artist", "Album", "Year", "Comment", "Genre"};
+            String[] labels = values.length == 6? new String[]{"Title", "Artist", "Album", "Year", "Comment", "Genre"} : new String[]{"Title", "Artist", "Album", "Year", "Comment", "Titlenum", "Genre"};
             for (int i = 0; i < values.length; i++) {
                 b.append(labels[i]).append(": [").append(values[i]).append("]").append("\n");
             }
@@ -269,10 +269,24 @@ public class MP3File {
                 in.readNBytes(current, 0, 4);
                 String year = new String(current).strip().replace(String.valueOf((char) 0), "");
                 current = new byte[30];
-                in.readNBytes(current, 0, 30);
+                in.readNBytes(current, 0, 28);
+                byte[] num = new byte[2];
+                in.readNBytes(num, 0, 2);
+                String fnum = "";
+                if (num[0] != 0) {
+                    current[28] = num[0];
+                    current[29] = num[1];
+                }else {
+                    fnum =String.valueOf(num[1]);
+                }
                 String comment = new String(current).strip().replace(String.valueOf((char) 0), "");
                 String genre = genres.get(in.readNBytes(1)[0]);
-                id3s.add(title + ";" + artist + ";" + album + ";" + year + ";" + comment + ";" + genre);
+                String csv =title + ";" + artist + ";" + album + ";" + year + ";" + comment ;
+                if (!fnum.isEmpty()){
+                    csv+=";"+fnum;
+                }
+                csv+= ";" + genre;
+                id3s.add(csv);
             } catch (IOException e) {
                 System.err.println(e.getMessage());
             }
