@@ -61,14 +61,15 @@ public class TestByteIO {
             throw new IllegalArgumentException("too many files");
         }
         for (int i = 0; i < splitSize; i++) {
-            OutputStream out = Files.newOutputStream(Path.of(String.format("%s.%08d", file, i)), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-            int toRead = Math.min(in.available(), (int) maxBytes);
+            OutputStream out = Files.newOutputStream(Path.of(String.format("%s.%08d", file, i+1)), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            int toRead = Math.min(in.available  (), (int) maxBytes);
             int size = Math.min(Math.min(2048, (int) maxBytes), in.available());
             byte[] buffer = new byte[size];
             int available = toRead;
             while (available > 0) {
-                available -= in.read(buffer, 0, size);
-                out.write(buffer, 0, size);
+                int change = in.read(buffer, 0, Math.min(size,available));
+                out.write(buffer, 0, Math.min(size,available));
+                available-=change;
             }
             out.close();
         }
@@ -76,12 +77,12 @@ public class TestByteIO {
     }
 
     public static void fileUnsplit(Path file) throws IOException {
-        if (!Files.exists(Path.of(file.toString() + ".00000000"))) {
+        if (!Files.exists(Path.of(file.toString() + ".00000001"))) {
             throw new IllegalArgumentException("no parts found");
         }
         OutputStream out = Files.newOutputStream(file, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         Path p;
-        for (int i = 0; Files.exists((p = Path.of(String.format("%s.%08d", file, i)))); i++) {
+        for (int i = 0; Files.exists((p = Path.of(String.format("%s.%08d", file, i+1)))); i++) {
             InputStream in = Files.newInputStream(p);
             byte[] buffer = new byte[2048];
             int bytesRead;

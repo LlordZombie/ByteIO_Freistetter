@@ -19,6 +19,11 @@ public class TestByteIOTests extends Thread {
             fileUnsplit(bp("ausgangsding.txt", false));
             fileSplit(bp("ausgangsding.txt", false), 2222);
             fileUnsplit(bp("ausgangsding.txt", false));
+            fileSplit(bp("ausgangsding.txt", false), 4000);
+            fileUnsplit(bp("ausgangsding.txt", false));
+            fileSplit(bp("ausgangsding.txt", false), 10000);
+            fileUnsplit(bp("ausgangsding.txt", false));
+
         } catch (IOException e) {
             throw new UncheckedIOException(new IOException(System.lineSeparator() + "Nicht meine Schuld:" + System.lineSeparator() + e));
         }
